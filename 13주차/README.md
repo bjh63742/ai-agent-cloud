@@ -109,6 +109,33 @@ uv python install 3.12 3.13
 uv python list
 ```
 
+### CLI 도구 설치 (tool)
+
+`uv tool`은 CLI 도구를 격리된 환경에 설치해 전역 명령어로 쓸 수 있게 합니다. `pipx`와 동일한 역할입니다.
+
+| 명령어 | 설명 |
+|--------|------|
+| `uv tool install <패키지>` | CLI 도구 전역 설치 |
+| `uv tool list` | 설치된 도구 목록 |
+| `uv tool uninstall <패키지>` | 도구 제거 |
+
+#### CrewAI 설치
+
+```bash
+uv tool install crewai-cli
+```
+
+> 공식 문서는 `uv tool install crewai`라고 안내하지만, 실제로는 CLI 실행 파일이 `crewai-cli` 패키지에 있으므로 위 명령어를 사용해야 합니다.
+
+설치 확인:
+
+```bash
+crewai --version
+uv tool list
+```
+
+---
+
 ### 패키지 관리 (pip 호환)
 
 | 명령어 | 설명 |
