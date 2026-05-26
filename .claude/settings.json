@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip list:*)",
+      "Bash(pip3 list:*)",
+      "Bash(open /Users/baejinho/Documents/GitHub/ai-agent-cloud/4/create-agent/agent_flow_diagram.html)"
+    ]
+  }
+}
