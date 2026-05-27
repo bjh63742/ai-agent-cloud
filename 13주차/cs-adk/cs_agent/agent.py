@@ -1,10 +1,9 @@
 from google.adk.agents import LlmAgent
-from google.adk.models.lite_llm import LiteLlm
 
 # 기술 지원 전문 에이전트
 tech_support_agent = LlmAgent(
     name="tech_support",
-    model=LiteLlm(model="ollama/qwen2.5-coder:7b"),
+    model="gemini-2.5-flash",
     instruction="""
     당신은 기술 지원 전문가입니다.
 
@@ -28,7 +27,7 @@ tech_support_agent = LlmAgent(
 # CS 접수 에이전트 (루트) — 문의 유형을 판단하고 기술 문제는 tech_support에 위임
 root_agent = LlmAgent(
     name="cs_receptionist",
-    model=LiteLlm(model="ollama/qwen2.5-coder:7b"),
+    model="gemini-2.5-flash",
     instruction="""
     당신은 CS 상담 접수 담당자입니다.
 
