@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-from pathlib import Path
-
 from pydantic import BaseModel
 
 from crewai.flow import Flow, listen, start
@@ -8,85 +6,72 @@ from crewai.flow import Flow, listen, start
 from cs_crew.crews.content_crew.content_crew import ContentCrew
 
 
-class ContentState(BaseModel):
-    topic: str = ""
-    outline: str = ""
-    draft: str = ""
-    final_post: str = ""
+class CSState(BaseModel):
+    user_message: str = ""  # 고객이 입력한 메시지
+    response: str = ""      # 최종 답변
 
 
-class ContentFlow(Flow[ContentState]):
+class CSFlow(Flow[CSState]):
 
     @start()
-    def plan_content(self, crewai_trigger_payload: dict = None):
-        print("Planning content")
+    def receive_message(self):
+        print(f"\n[접수] 고객 메시지: {self.state.user_message}")
 
-        if crewai_trigger_payload:
-            self.state.topic = crewai_trigger_payload.get("topic", "AI Agents")
-            print(f"Using trigger payload: {crewai_trigger_payload}")
-        else:
-            self.state.topic = "AI Agents"
-
-        print(f"Topic: {self.state.topic}")
-
-    @listen(plan_content)
-    def generate_content(self):
-        print(f"Generating content on: {self.state.topic}")
+    @listen(receive_message)
+    def process_message(self):
+        # 크루에 고객 메시지를 전달하고 결과를 받음
         result = (
             ContentCrew()
             .crew()
-            .kickoff(inputs={"topic": self.state.topic})
+            .kickoff(inputs={"user_message": self.state.user_message})
         )
 
-        print("Content generated")
-        self.state.final_post = result.raw
+        reception_output = result.tasks_output[0].raw
+        tech_support_output = result.tasks_output[1].raw
 
-    @listen(generate_content)
-    def save_content(self):
-        print("Saving content")
-        output_dir = Path("output")
-        output_dir.mkdir(exist_ok=True)
-        with open(output_dir / "post.md", "w") as f:
-            f.write(self.state.final_post)
-        print("Post saved to output/post.md")
+        # [기술지원필요]가 없으면 접수 담당자 답변, 있으면 기술지원 답변 사용
+        if "[기술지원필요]" not in reception_output:
+            self.state.response = reception_output
+        elif tech_support_output.strip() != "SKIP":
+            self.state.response = tech_support_output
+        else:
+            self.state.response = reception_output
+
+    @listen(process_message)
+    def display_response(self):
+        print(f"\n상담원: {self.state.response}\n")
+        print("-" * 60)
+
+
+def chat():
+    print("=" * 60)
+    print("CS 상담 챗봇을 시작합니다.")
+    print("종료하려면 '종료' 또는 'q'를 입력하세요.")
+    print("=" * 60 + "\n")
+
+    while True:
+        user_message = input("고객: ").strip()
+
+        if not user_message:
+            continue
+
+        if user_message in ("종료", "q", "quit", "exit"):
+            print("상담을 종료합니다.")
+            break
+
+        flow = CSFlow()
+        flow.state.user_message = user_message
+        flow.kickoff()
 
 
 def kickoff():
-    content_flow = ContentFlow()
-    content_flow.kickoff()
+    chat()
 
 
 def plot():
-    content_flow = ContentFlow()
-    content_flow.plot()
-
-
-def run_with_trigger():
-    """
-    Run the flow with trigger payload.
-    """
-    import json
-    import sys
-
-    # Get trigger payload from command line argument
-    if len(sys.argv) < 2:
-        raise Exception("No trigger payload provided. Please provide JSON payload as argument.")
-
-    try:
-        trigger_payload = json.loads(sys.argv[1])
-    except json.JSONDecodeError:
-        raise Exception("Invalid JSON payload provided as argument")
-
-    # Create flow and kickoff with trigger payload
-    # The @start() methods will automatically receive crewai_trigger_payload parameter
-    content_flow = ContentFlow()
-
-    try:
-        result = content_flow.kickoff({"crewai_trigger_payload": trigger_payload})
-        return result
-    except Exception as e:
-        raise Exception(f"An error occurred while running the flow with trigger: {e}")
+    flow = CSFlow()
+    flow.plot()
 
 
 if __name__ == "__main__":
-    kickoff()
+    chat()

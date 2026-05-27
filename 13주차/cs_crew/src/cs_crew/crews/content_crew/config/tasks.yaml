@@ -1,50 +1,33 @@
-planning_task:
+reception_task:
   description: >
-    Create a detailed outline for a blog post about {topic}.
+    고객 메시지: {user_message}
 
-    The outline should include:
-    - A compelling title
-    - An introduction hook
-    - 3-5 main sections with key points to cover in each
-    - A conclusion with a call to action
+    위 메시지를 읽고 아래 두 가지 중 하나만 수행한다.
 
-    Make the outline detailed enough that a writer can produce
-    a full blog post from it without additional research.
+    [경우 1] 기술 문제인 경우 (소프트웨어 오류, 하드웨어 고장, 네트워크, 앱 오류, 계정 문제 등):
+    반드시 첫 줄을 "[기술지원필요]"로 시작하고, 다음 줄에 문제를 한 줄로 요약한다.
+    예시: "[기술지원필요]\n고객 컴퓨터가 고장나서 켜지지 않음"
+
+    [경우 2] 기술 문제가 아닌 경우 (인사, 배송, 환불, 서비스 불만, 단순 문의 등):
+    고객에게 직접 친절하게 답변한다. "[기술지원필요]"는 절대 쓰지 않는다.
   expected_output: >
-    A structured blog post outline with a title, introduction notes,
-    detailed section breakdowns, and conclusion notes.
-  agent: planner
+    기술 문제: 첫 줄이 "[기술지원필요]"인 텍스트
+    그 외: 고객에게 전달할 답변 텍스트
+  agent: cs_receptionist
 
-writing_task:
+tech_support_task:
   description: >
-    Using the outline provided, write a full blog post about {topic}.
+    이전 CS 접수 담당자의 결과를 확인하라.
 
-    Requirements:
-    - Follow the outline structure closely
-    - Write in a clear, engaging, and conversational tone
-    - Each section should be 2-3 paragraphs
-    - Include a strong introduction and conclusion
-    - Target around 800-1200 words
+    결과가 "[기술지원필요]"로 시작하면 아래 형식으로 기술 답변을 작성한다:
+    1. 문제 원인을 쉽게 설명
+    2. 해결 방법을 단계별로 안내
+    3. 추가 질문 환영 멘트로 마무리
+
+    결과가 "[기술지원필요]"로 시작하지 않으면 반드시 "SKIP"이라고만 출력한다.
   expected_output: >
-    A complete blog post in markdown format, ready for editing.
-    The post should follow the outline and be well-written with
-    clear transitions between sections.
-  agent: writer
-
-editing_task:
-  description: >
-    Review and edit the blog post about {topic}.
-
-    Focus on:
-    - Fixing any grammar or spelling errors
-    - Improving sentence clarity and flow
-    - Ensuring consistent tone throughout
-    - Strengthening the introduction and conclusion
-    - Removing any redundancy
-
-    Do not rewrite the post — refine and polish it.
-  expected_output: >
-    The final, polished blog post in markdown format without '```'.
-    Publication-ready with clean formatting and professional prose.
-  agent: editor
-  output_file: output/post.md
+    기술 지원 필요 시: 고객에게 전달할 단계별 해결 안내 텍스트
+    필요하지 않을 시: "SKIP"
+  agent: tech_support
+  context:
+    - reception_task
