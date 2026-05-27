@@ -1,56 +1,64 @@
-# {{crew_name}} Crew
+# CS Crew
 
-Welcome to the {{crew_name}} Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+CrewAI 기반 CS(고객 상담) 자동화 프로젝트입니다.
+고객 문의를 접수·분류하고, 기술 문제는 전문 에이전트가 처리하는 멀티 에이전트 시스템입니다.
 
-## Installation
+## 설치
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+Python 3.10 이상 3.14 미만이 필요합니다. 패키지 관리는 [UV](https://docs.astral.sh/uv/)를 사용합니다.
 
-First, if you haven't already, install uv:
+uv가 없다면 먼저 설치합니다:
 
 ```bash
 pip install uv
 ```
 
-Next, navigate to your project directory and install the dependencies:
+프로젝트 디렉토리에서 의존성을 설치합니다:
 
-(Optional) Lock the dependencies and install them by using the CLI command:
 ```bash
 crewai install
 ```
 
-### Customizing
+## 설정
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+`.env` 파일에 필요한 환경 변수를 설정합니다.
 
-- Modify `src/cs_crew/config/agents.yaml` to define your agents
-- Modify `src/cs_crew/config/tasks.yaml` to define your tasks
-- Modify `src/cs_crew/crew.py` to add your own logic, tools and specific args
-- Modify `src/cs_crew/main.py` to add custom inputs for your agents and tasks
+| 파일 | 역할 |
+|------|------|
+| `src/cs_crew/crews/content_crew/config/agents.yaml` | 에이전트 역할·목표·배경 정의 |
+| `src/cs_crew/crews/content_crew/config/tasks.yaml` | 태스크 지시·기대 결과 정의 |
+| `src/cs_crew/crews/content_crew/content_crew.py` | YAML과 Python 객체 매핑 |
+| `src/cs_crew/main.py` | Flow 및 챗 루프 제어 |
 
-## Running the Project
-
-To kickstart your flow and begin execution, run this from the root folder of your project:
+## 실행
 
 ```bash
 crewai run
 ```
 
-This command initializes the cs-crew Flow as defined in your configuration.
+실행하면 챗 방식으로 고객 상담을 시작합니다. `종료` 또는 `q`를 입력하면 종료됩니다.
 
-This example, unmodified, will run a content creation flow on AI Agents and save the output to `output/post.md`.
+## 에이전트 구성
 
-## Understanding Your Crew
+| 에이전트 | 역할 |
+|----------|------|
+| `cs_receptionist` | 고객 문의 접수 및 유형 분류 (일반 불만 직접 처리 / 기술 문제 라우팅) |
+| `tech_support` | 소프트웨어·하드웨어·네트워크 등 기술 문의 전담 처리 |
 
-The cs-crew Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+## 처리 흐름
 
-## Support
+```
+고객 입력
+    ↓
+cs_receptionist (접수·분류)
+    ├─ 일반 문의 → 직접 답변
+    └─ 기술 문제 → [기술지원필요] 태그
+                        ↓
+                  tech_support (기술 답변)
+```
 
-For support, questions, or feedback regarding the {{crew_name}} Crew or crewAI.
+## 참고 자료
 
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
-
-Let's create wonders together with the power and simplicity of crewAI.
+- [CrewAI 공식 문서](https://docs.crewai.com)
+- [GitHub 저장소](https://github.com/joaomdmoura/crewai)
+- [Discord 커뮤니티](https://discord.com/invite/X4JWnZnxPb)
