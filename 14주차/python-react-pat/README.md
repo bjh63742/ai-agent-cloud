@@ -23,13 +23,18 @@ pip install ollama
 ## 실행
 
 ```bash
-uv run main.py
+# 수동 단계 실행 (ReAct 개념 학습용)
+uv run simple.py
+
+# 자동 루프 실행
+uv run simple-loop.py
 ```
 
 ## 구조
 
 ```
-main.py   # Agent 클래스 및 진입점
+simple.py        # Agent 클래스 및 수동 단계 실행 (ReAct 기초)
+simple-loop.py   # 자동 ReAct 루프 (Action 파싱 → 함수 실행 → Observation 반복)
 ```
 
 ### Agent 클래스
