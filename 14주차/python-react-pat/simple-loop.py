@@ -1,4 +1,5 @@
 import ollama
+import re
 
 MODEL = "qwen2.5-coder:7b"
 
@@ -74,16 +75,36 @@ known_actions = {
     "average_dog_weight": average_dog_weight
 }
 
-abot = Agent(prompt)
+action_re = re.compile('^Action: (\w+): (.*)$')   # python regular expression to selection action
 
-result = abot("Toy Poodle의 체중은 얼마인가요?")
-print("1:" + result)
+def query(question, max_turns=5):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i < max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print("1:" + result)
+        actions = []
+        for a in result.split('\n'):
+            m = action_re.match(a)
+            if m:
+                actions.append(m.groups())
+        print("2: actions:", actions)
+        if actions:
+            # There is an action to run
+            action, action_input = actions[0]
+            print("3: -- action:", action, "input:", action_input)
+            if action not in known_actions:
+                raise Exception("Unknown action: {}: {}".format(action, action_input))
+            print("4: -- running {} {}".format(action, action_input))
+            observation = known_actions[action](action_input)
+            print("Observation:", observation)
+            next_prompt = "Observation: {}".format(observation)
+        else:
+            return
+        
 
-result = average_dog_weight("Toy Poodle")
-print("2:" + result)
-
-next_prompt = "Observation: {}".format(result)
-
-print(next_prompt)
-result = abot(next_prompt)
-print("3:" + result)
+question = """나는 개를 2마리 키우고 있는데, border collie와 Scottish Terrier입니다. \
+두 마리의 합산 체중은 얼마인가요?"""
+query(question)
