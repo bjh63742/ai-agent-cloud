@@ -1,13 +1,15 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from langgraph.graph import StateGraph, END
 from typing import TypedDict, Annotated
-from IPython.display import Image
 import operator
 from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage, ToolMessage
 from langchain_ollama import ChatOllama
-from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearch
 
 
-tool = TavilySearchResults(max_results=4) #increased number of results
+tool = TavilySearch(max_results=4)
 print(type(tool))
 print(tool.name)
 
@@ -58,32 +60,27 @@ class Agent:
         return {'messages': results}
     
 
-prompt = """You are a smart research assistant. Use the search engine to look up information. \
-You are allowed to make multiple calls (either together or in sequence). \
-Only look up information when you are sure of what you want. \
-If you need to look up some information before asking a follow up question, you are allowed to do that!
+prompt = """당신은 똑똑한 리서치 어시스턴트입니다. 검색 엔진을 사용하여 정보를 찾아보세요. \
+여러 번 검색을 수행할 수 있습니다(동시에 또는 순차적으로). \
+무엇을 찾고 싶은지 확실할 때만 검색하세요. \
+후속 질문을 하기 전에 정보를 먼저 찾아야 한다면, 그렇게 해도 됩니다!
 """
 
 model = ChatOllama(model="qwen2.5-coder:7b")
 abot = Agent(model, [tool], system=prompt)
 
-Image(abot.graph.get_graph().draw_png())
-
-messages = [HumanMessage(content="What is the weather in sf?")]
+messages = [HumanMessage(content="샌프란시스코의 날씨는 어때?")]
 result = abot.graph.invoke({"messages": messages})
 
 print(result['messages'][-1].content)
 
-messages = [HumanMessage(content="What is the weather in SF and LA?")]
+messages = [HumanMessage(content="샌프란시스코와 LA의 날씨는 어때?")]
 result = abot.graph.invoke({"messages": messages})
 
 print(result['messages'][-1].content)
 
-# Note, the query was modified to produce more consistent results.
-# Results may vary per run and over time as search information and models change.
-
-query = "Who won the super bowl in 2024? In what state is the winning team headquarters located? \
-What is the GDP of that state? Answer each question."
+query = "2024년 슈퍼볼에서 우승한 팀은 어디인가요? 우승팀의 본부는 어느 주에 있나요? \
+그 주의 GDP는 얼마인가요? 각 질문에 답해주세요."
 messages = [HumanMessage(content=query)]
 
 model = ChatOllama(model="qwen2.5-coder:7b")
