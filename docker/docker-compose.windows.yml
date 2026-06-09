@@ -1,0 +1,39 @@
+services:
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  mysql:
+    image: mysql:8.4
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: password
+
+  postgres:
+    image: postgres
+    ports:
+      - '5432:5432'
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    command: [
+      'redis-server',
+      '--bind', '0.0.0.0',
+      '--protected-mode', 'no',
+      '--save', "''",
+      '--appendonly', 'no'
+    ]
