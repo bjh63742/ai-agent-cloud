@@ -1,4 +1,4 @@
-from agent import graph
+from essay_agent import graph
 
 
 def main():

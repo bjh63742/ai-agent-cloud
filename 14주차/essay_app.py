@@ -1,11 +1,11 @@
 import gradio as gr
-from agent import graph
+from essay_agent import graph
 
 def run_essay_writer(task: str, max_revisions: int, model_name: str):
     import os
     os.environ["OLLAMA_MODEL"] = model_name
 
-    import agent as ag
+    import essay_agent as ag
     from langchain_ollama import ChatOllama
     ag.model = ChatOllama(model=model_name, temperature=0)
 
