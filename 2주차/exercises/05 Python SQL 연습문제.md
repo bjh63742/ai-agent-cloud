@@ -9,9 +9,22 @@
 
 ## 사전 준비
 
+**방법 A — uv 프로젝트로 시작 (권장)**
+
 ```bash
-pip install pandas ipython-sql
+uv init                          # pyproject.toml 생성 (이미 프로젝트면 생략)
+uv add pandas ipython-sql        # 의존성 추가 + 설치
 ```
+
+**방법 B — 프로젝트 없이 가상환경에만 설치**
+
+```bash
+uv venv                          # .venv 생성
+uv pip install pandas ipython-sql
+```
+
+> `uv add`는 `pyproject.toml`이 있어야 하므로 `uv init`이 선행되어야 합니다.
+> 빠르게 설치만 하고 싶다면 방법 B를 쓰세요.
 
 ```python
 import sqlite3
